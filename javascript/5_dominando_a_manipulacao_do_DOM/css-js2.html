@@ -1,0 +1,34 @@
+<html>
+    <body>
+       
+        <div class="testes">
+            <div class="inside-testes">Texto</div>
+            <!-- inside-testes -->
+        </div>
+        <!-- testes -->
+
+        <div class="testes">
+            <div class="inside-testes">Texto2</div>
+            <!-- inside-testes -->
+        </div>
+        <!-- testes -->
+
+        <div class="ola">Heart</div>
+        <!-- ola -->
+
+        <div class="ola">Mind</div>
+        <!-- ola -->
+
+        <div class="ola">Spirit</div>
+        <!-- ola -->
+
+        <script>
+            var elements = document.querySelectorAll('.testes .inside-testes');
+
+            elements[0].style.color = 'red';
+
+            var hello = document.querySelector('.ola');
+            console.log(hello.innerHTML);
+        </script>
+    </body>    
+</html>

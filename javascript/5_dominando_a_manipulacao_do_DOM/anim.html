@@ -1,0 +1,48 @@
+<html>
+
+    <head>
+        <style>
+            .conteudo h2 span {
+                font-size: 13px;
+                cursor: pointer;
+            }
+            .conteudo p {
+                overflow: hidden;
+                height: 0;
+                transition: 1s;
+            }
+
+            .conteudo p.mostrar {
+                height: 200px;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <div class="conteudo">
+            <h2>Título do Conteúdo <span>Ver mais!</span></h2>
+            <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem hic rerum ratione expedita facere minus blanditiis neque dolorem inventore, quisquam voluptatem quas saepe magni, dicta dolores doloribus cum amet ut! Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem hic rerum ratione expedita facere minus blanditiis neque dolorem inventore, quisquam voluptatem quas saepe magni, dicta dolores doloribus cum amet ut! Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem hic rerum ratione expedita facere minus blanditiis neque dolorem inventore, quisquam voluptatem quas saepe magni, dicta dolores doloribus cum amet ut! Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem hic rerum ratione expedita facere minus blanditiis neque dolorem inventore, quisquam voluptatem quas saepe magni, dicta dolores doloribus cum amet ut!
+            </p>
+        </div>
+        <!-- conteudo -->
+
+        <script>
+            
+            document.querySelector('.conteudo span').addEventListener("click", () => {
+                var conteudo = document.querySelector('.conteudo p');
+                //conteudo.classList.add('mostrar');
+
+                if (conteudo.classList.contains('mostrar')) {
+                    document.querySelector('.conteudo span').textContent = 'Ver mais!';
+                    conteudo.classList.remove('mostrar');
+                } else {
+                    document.querySelector('.conteudo span').textContent = 'Ver menos!';
+                    conteudo.classList.add('mostrar');
+                }
+            })
+            
+        </script>
+    </body>
+</html>

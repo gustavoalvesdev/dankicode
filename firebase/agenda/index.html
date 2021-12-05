@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO APP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+
+        body {
+            background-color: #b3e8e8;
+            padding: 10px;
+        }
+
+        .container-login {
+            display: none;
+        }
+
+        .container-login,
+        .login {
+            max-width: 750px;
+            margin: 0 auto;
+            text-align: center;
+            background-color: rgb(240, 240, 240);
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        input {
+            width: 100%;
+            height: 40px;
+            display: block;
+            max-width: 500px;
+            margin: 10px auto;
+            padding-left: 10px;
+        }
+
+        input[type=submit] {
+            background-color: #673ab7;
+            color: white;
+            font-size: 15px;
+            border: 0;
+            cursor: pointer;
+        }
+
+        .container-login textarea {
+            width: 100%;
+            height: 120px;
+            display: block;
+            max-width: 500px;
+            margin: 10px auto;
+            padding: 10px;
+        }
+
+        .tarefas-usuario ul {
+            list-style: none;
+        }
+
+        .tarefas-usuario li {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .tarefas-usuario li a {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login">
+        <h2>Faça o Login no App</h2>
+        <form class="login-form">
+            <input type="email" name="email" placeholder="Seu e-mail">
+            <input type="password" name="password" placeholder="Sua senha">
+            <input type="submit" name="acao" value="Logar">
+        </form>
+        <!-- login-form -->
+    </div>
+    <!-- login -->
+
+    <div class="container-login">
+        <h2>Olá, você está logado! <a class="logout" href="javascript:void(0)">Logout</a></h2>
+        <!-- logout -->
+        <form class="form-cadastro-tarefa">
+            <textarea name="tarefa" placeholder="Nome da Sua Tarefa"></textarea>
+            <input type="datetime-local" name="datetime">
+            <input type="submit" name="acao" value="Cadastrar Tarefa">
+        </form>
+        <!-- form-cadastro-tarefa -->
+		
+		<div class="tarefas-usuario">
+			<h3>Listagem de tarefas atuais:</h3>
+			<ul id="tarefas">
+				
+			</ul>
+			<!-- tarefas -->
+		</div>
+		<!-- tarefas-usuario -->
+    </div>
+    <!-- container-login -->
+
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-firestore.js"></script>
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyBiu7xceKjmo0TAPASVmTbSgehOqOr3CqQ",
+            authDomain: "todolist-e0e94.firebaseapp.com",
+            projectId: "todolist-e0e94",
+            storageBucket: "todolist-e0e94.appspot.com",
+            messagingSenderId: "376567430725",
+            appId: "1:376567430725:web:2976f25ee37cdf61d72d2c"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // App starts here
+        var usuario = null;
+
+        var formLogin = document.querySelector("form.login-form");
+        var btnLogout = document.querySelector('.logout');
+
+        formLogin.addEventListener("submit", (e) => {
+            e.preventDefault();
+            let email = document.querySelector('[name=email]').value;
+            let password = document.querySelector('[name=password]').value;
+
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    usuario = userCredential.user;
+
+                    //alert('Logado com sucesso ' + usuario.email);
+                    document.querySelector('.login').style.display = 'none';
+                    document.querySelector('.container-login').style.display = 'block';
+
+                    formLogin.reset();
+                })
+                .catch((error) => {
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    alert(errorMessage);
+                });
+        });
+
+		const db = firebase.firestore(); 
+		
+        firebase.auth().onAuthStateChanged((val) => {
+
+            if (val) {
+                usuario= val;
+                //alert('Bem-vindo de volta, ' + usuario.email);
+			
+                document.querySelector('.login').style.display = 'none';
+                document.querySelector('.container-login').style.display = 'block';
+				
+				// Ouvir por mudanças no banco de dados
+				
+				db.collection('tarefas').where('horario', '!=', null).onSnapshot((data) => {
+                    let list = document.querySelector('#tarefas')
+                    list.innerHTML = '';
+                    let tarefas = data.docs;
+                    tarefas = tarefas.sort(function(a, b) {
+                        if (a.data().horario < b.data().horario)
+                            return -1;
+                        else 
+                            return +1;
+                    })
+
+                    tarefas.map((val) => {
+                        list.innerHTML += `<li>${val.data().tarefa} <a tarefa-id="${val.id}" class="excluir-btn" href="javascript:void(0)">(X)</a></li>`
+                    })
+
+                    var excluirTarefas = document.querySelectorAll('.excluir-btn');
+
+                    excluirTarefas.forEach(element => {
+                        element.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            let docId = element.getAttribute("tarefa-id");
+
+                            db.collection('tarefas').doc(docId).delete();
+                        })
+                    })
+                    
+
+                })
+            }
+
+        }); 
+
+        btnLogout.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            
+            firebase.auth().signOut().then(() => {
+                usuario = null;
+                alert('Deslogado');
+                document.querySelector('.login').style.display = 'block';
+                document.querySelector('.container-login').style.display = 'none';
+				
+				
+
+				
+            }).catch((error) => {
+                
+            });
+        });
+		
+		
+        var formCadastro = document.querySelector(".form-cadastro-tarefa");
+
+        
+        
+        formCadastro.addEventListener("submit", e => {
+            e.preventDefault();
+            let tarefa = document.querySelector('.form-cadastro-tarefa [name=tarefa]').value;
+            let dateTime = document.querySelector('.form-cadastro-tarefa [name=datetime]').value;
+
+            let dataAtual = new Date().getTime();
+
+            if (dataAtual > new Date(dateTime).getTime()) {
+                alert('Você informou uma data no passado...');
+            }  else if (tarefa == '' || dateTime == '') {
+                alert('Você não pode deixar campos vazios!');
+            } else {
+                // Inserir e criar coleção caso não exista.
+                db.collection('tarefas').add({
+                    tarefa: tarefa,
+                    horario: new Date(dateTime).getTime(),
+					userId: usuario.uid
+                });
+
+                formCadastro.reset();
+
+                alert('Sua tarefa foi cadastrada com sucesso!');
+            }
+            
+        });
+    </script>
+</body>
+
+</html>
