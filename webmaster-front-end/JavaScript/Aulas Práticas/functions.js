@@ -1,18 +1,23 @@
 window.onload = function () {
-	var semaforo = ['verde', 'vermelho', 'amarelo'];
+	var tabuada = 1;
 	
-	var opcaoAtivaDoSemaforo = semaforo[0];
-	
-	switch(opcaoAtivaDoSemaforo) {
-		case 'verde':
-			alert('Pode passar à vontade!');
-		break;
-		case 'vermelho':
-			alert('Pare!');
-		break;case 'amarelo':
-			alert('Tenha cautela!');
-		break;
-		default:
-			alert('O semáforo está quebrado!');
+	while(tabuada <= 10) {
+		
+		calculaTabuada(tabuada);
+		
+		tabuada++;
+		
 	}
+}
+
+function calculaTabuada(numero) {
+	
+	for (var i = 0; i <= 10; i++) {
+		
+		document.write(numero + ' x ' + i + ' = ' + (numero * i) + '<br>');
+		
+	}
+	
+	document.write('========================<br>');
+	
 }
